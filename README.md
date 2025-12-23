@@ -20,6 +20,44 @@ Progettino semplice a microservizi in .NET 8 (Catalogo + Ordini) con MySQL (EF C
 
 ---
 
+## Convenzioni di lavoro (branch e commit)
+
+Per mantenere una cronologia pulita e un flusso di lavoro prevedibile, usiamo queste convenzioni:
+
+### Branch
+- **`main`**: contiene sempre il codice stabile (pronto all’esecuzione).
+- **`feature/<descrizione>`**: un branch per ogni funzionalità o attività incrementale.  
+  Esempi:
+  - `feature/catalog-api`
+  - `feature/order-saga-kafka`
+  - `feature/http-resilience`
+- **`hotfix/<descrizione>`**: correzioni urgenti su bug bloccanti (tipicamente da `main`).  
+  Esempi:
+  - `hotfix/compose-env-vars`
+  - `hotfix/migrations-startup`
+
+> Suggerimento pratico: apri una Pull Request verso `main` quando la feature è completa e la build/compose passano.
+
+### Commit (Conventional Commits)
+Adottiamo lo standard **Conventional Commits** per rendere la cronologia chiara e (se serve) generare changelog automatici.
+
+Formati tipici:
+- `feat: ...` → nuova funzionalità
+- `fix: ...` → correzione bug
+- `chore: ...` → manutenzione (config, refactor non funzionale, aggiornamenti tool)
+- `docs: ...` → documentazione (README, note)
+- `test: ...` → test
+- `refactor: ...` → refactor senza cambiare comportamento
+
+Esempi:
+- `feat: add create-order endpoint`
+- `fix: handle mysql not ready on startup`
+- `chore: add github actions for ghcr`
+- `docs: update run instructions`
+- `refactor: simplify stock reservation logic`
+
+---
+
 ## Struttura repository
 
 - `/shared/` → libreria **Shared** pubblicata come pacchetto **NuGet** (GitHub Packages)
