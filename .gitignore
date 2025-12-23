@@ -414,5 +414,13 @@ FodyWeavers.xsd
 *.cab
 *.msi
 *.msix
+
+# JetBrains Rider / IntelliJ
+.idea/
+*.sln.iml
+
+# Rider / JetBrains caches (extra safe)
+*.DotSettings.user
+
 *.msm
 *.msp
