@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace CatalogOrders.Shared.Events;
 
 /// <summary>
@@ -5,15 +7,13 @@ namespace CatalogOrders.Shared.Events;
 /// Pubblicato da: CatalogService
 /// Ascoltato da: (opzionale, può servire per logging/audit)
 /// </summary>
-public class StockReleasedEvent
-{
-    public int OrderId { get; set; }
-    public List<ReleasedItem> ReleasedItems { get; set; } = new();
-    public DateTimeOffset ReleasedAt { get; set; }
-}
+public record StockReleasedEvent(
+    [property: JsonPropertyName("orderId")] int OrderId,
+    [property: JsonPropertyName("releasedItems")] List<ReleasedItem> ReleasedItems,
+    [property: JsonPropertyName("releasedAt")] DateTimeOffset ReleasedAt
+);
 
-public class ReleasedItem
-{
-    public int ProductId { get; set; }
-    public int QuantityReleased { get; set; }
-}
+public record ReleasedItem(
+    [property: JsonPropertyName("productId")] int ProductId,
+    [property: JsonPropertyName("quantityReleased")] int QuantityReleased
+);

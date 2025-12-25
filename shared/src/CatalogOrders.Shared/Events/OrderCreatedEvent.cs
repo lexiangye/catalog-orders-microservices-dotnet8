@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace CatalogOrders.Shared.Events;
 
 /// <summary>
@@ -5,18 +7,16 @@ namespace CatalogOrders.Shared.Events;
 /// Pubblicato da: OrderService
 /// Ascoltato da: CatalogService (per riservare stock)
 /// </summary>
-public class OrderCreatedEvent
-{
-    public int OrderId { get; set; }
-    public List<OrderLineItem> Items { get; set; } = new();
-    public DateTimeOffset CreatedAt { get; set; }
-}
+public record OrderCreatedEvent(
+    [property: JsonPropertyName("orderId")] int OrderId,
+    [property: JsonPropertyName("items")] List<OrderLineItem> Items,
+    [property: JsonPropertyName("createdAt")] DateTimeOffset CreatedAt
+);
 
 /// <summary>
 /// Riga dell'ordine nell'evento (versione semplificata)
 /// </summary>
-public class OrderLineItem
-{
-    public int ProductId { get; set; }
-    public int Quantity { get; set; }
-}
+public record OrderLineItem(
+    [property: JsonPropertyName("productId")] int ProductId,
+    [property: JsonPropertyName("quantity")] int Quantity
+);

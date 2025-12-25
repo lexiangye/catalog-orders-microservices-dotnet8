@@ -3,12 +3,12 @@
 /// <summary>
 /// DTO per trasferire informazioni sul prodotto via HTTP
 /// </summary>
-public class ProductDto
+public record ProductDto
 {
-    public int Id { get; set; }                         // Id del prodotto
-    public string Name { get; set; } = string.Empty;    // Nome del prodotto
-    public decimal Price { get; set; }                  // Prezzo del prodotto
-    public int AvailableQuantity { get; set; }          // Stock disponibile
+    public int Id { get; init; }                         // Id del prodotto
+    public string Name { get; init; } = string.Empty;    // Nome del prodotto
+    public decimal Price { get; init; }                  // Prezzo del prodotto
+    public int AvailableQuantity { get; init; }          // Stock disponibile
 }
 
 /*

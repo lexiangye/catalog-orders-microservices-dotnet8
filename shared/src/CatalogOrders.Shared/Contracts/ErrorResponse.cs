@@ -1,12 +1,9 @@
-// Formato standardizzato per restituire errori dalle API
-// Rende gli errori consistenti tra CatalogService e OrderService
-
 namespace CatalogOrders.Shared.Contracts;
 
 /// <summary>
 /// Formato standard per errori API
 /// </summary>
-public class ErrorResponse
+public record ErrorResponse
 {
     public string ErrorCode { get; set; } = string.Empty;
     public string Message { get; set; } = string.Empty;

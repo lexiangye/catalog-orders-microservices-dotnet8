@@ -1,16 +1,14 @@
-// Rappresenta una singola riga dell'ordine (un prodotto + quantità)
-
 namespace CatalogOrders.Shared.Contracts;
 
 /// <summary>
 /// Rappresenta una riga dell'ordine (prodotto + quantità)
 /// </summary>
-public class OrderLineDto
+public record OrderLineDto
 {
-    public int ProductId { get; set; }
-    public string ProductName { get; set; } = string.Empty;
-    public int Quantity { get; set; }
-    public decimal UnitPrice { get; set; }
+    public int ProductId { get; init; }
+    public string ProductName { get; init; } = string.Empty;
+    public int Quantity { get; init; }
+    public decimal UnitPrice { get; init; }
     
     /// <summary>
     /// Totale della riga (calcolato)

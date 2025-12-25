@@ -1,5 +1,3 @@
-// DTO completo di un ordine, usato nelle API per restituire ordini
-
 namespace CatalogOrders.Shared.Contracts;
 
 using CatalogOrders.Shared.Enums;
@@ -7,14 +5,14 @@ using CatalogOrders.Shared.Enums;
 /// <summary>
 /// DTO completo di un ordine (usato nelle API)
 /// </summary>
-public class OrderDto
+public record OrderDto
 {
-    public int Id { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public OrderStatus Status { get; set; }
+    public int Id { get; init; }
+    public DateTimeOffset CreatedAt { get; init; }
+    public OrderStatus Status { get; init; }
     
     // Lista delle righe d'ordine
-    public List<OrderLineDto> Lines { get; set; } = new();
+    public List<OrderLineDto> Lines { get; init; } = new();
     
     
     /// <summary>

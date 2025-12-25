@@ -1,4 +1,5 @@
 using CatalogOrders.Shared.Enums;
+using System.Text.Json.Serialization;
 
 namespace CatalogOrders.Shared.Events;
 
@@ -6,46 +7,30 @@ namespace CatalogOrders.Shared.Events;
 /// Wrapper generico per tutti gli eventi Kafka.
 /// Include metadata per idempotenza e tracking.
 /// </summary>
-public class EventEnvelope<T> where T : class
+public record EventEnvelope<T>(
+    [property: JsonPropertyName("eventId")] Guid EventId,
+    [property: JsonPropertyName("eventType")] EventType EventType,
+    [property: JsonPropertyName("occurredAt")] DateTimeOffset OccurredAt,
+    [property: JsonPropertyName("payload")] T Payload
+) where T : class
 {
     /// <summary>
-    /// ID univoco per gestire idempotenza (evita duplicati)
-    /// </summary>
-    public Guid EventId { get; set; }
-    
-    /// <summary>
-    /// Tipo di evento (per logging e routing)
-    /// </summary>
-    public EventType EventType { get; set; }
-    
-    /// <summary>
-    /// Timestamp UTC di quando è avvenuto l'evento
-    /// </summary>
-    public DateTimeOffset OccurredAt { get; set; }
-    
-    /// <summary>
-    /// Payload dell'evento (il contenuto vero e proprio)
-    /// </summary>
-    public T Payload { get; set; } = null!;
-    
-    /// <summary>
-    /// Factory method per creare un envelope in modo comodo
+    /// Factory method statico per creare un envelope in modo comodo
     /// </summary>
     public static EventEnvelope<T> Create(T payload, EventType eventType)
     {
-        return new EventEnvelope<T>
-        {
-            EventId = Guid.NewGuid(),
-            EventType = eventType,
-            OccurredAt = DateTimeOffset.UtcNow,
-            Payload = payload
-        };
+        return new EventEnvelope<T>(
+            Guid.NewGuid(),
+            eventType,
+            DateTimeOffset.UtcNow,
+            payload
+        );
     }
 }
 
 /*
 A cosa serve: È un wrapper generico che avvolge tutti gli eventi Kafka.
-   
+
 Perché serve:
   - EventId: per l'idempotenza (evitare di processare lo stesso messaggio due volte)
   - EventType: per sapere che tipo di evento è (utile per logging/debugging)

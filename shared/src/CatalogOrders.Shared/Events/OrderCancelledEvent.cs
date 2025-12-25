@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace CatalogOrders.Shared.Events;
 
 /// <summary>
@@ -5,10 +7,9 @@ namespace CatalogOrders.Shared.Events;
 /// Pubblicato da: OrderService
 /// Ascoltato da: CatalogService (per rilasciare stock - compensazione)
 /// </summary>
-public class OrderCancelledEvent
-{
-    public int OrderId { get; set; }
-    public List<OrderLineItem> Items { get; set; } = new();
-    public DateTimeOffset CancelledAt { get; set; }
-    public string? CancellationReason { get; set; }
-}
+public record OrderCancelledEvent(
+    [property: JsonPropertyName("orderId")] int OrderId,
+    [property: JsonPropertyName("items")] List<OrderLineItem> Items, // Fondamentale per il rilascio!
+    [property: JsonPropertyName("cancelledAt")] DateTimeOffset CancelledAt,
+    [property: JsonPropertyName("reason")] string? Reason = null
+);

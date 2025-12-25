@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace CatalogOrders.Shared.Events;
 
 /// <summary>
@@ -5,17 +7,15 @@ namespace CatalogOrders.Shared.Events;
 /// Pubblicato da: CatalogService
 /// Ascoltato da: OrderService (per rigettare ordine)
 /// </summary>
-public class StockReservationFailedEvent
-{
-    public int OrderId { get; set; }
-    public string Reason { get; set; } = string.Empty;
-    public List<FailedItem> FailedItems { get; set; } = new();
-    public DateTimeOffset FailedAt { get; set; }
-}
+public record StockReservationFailedEvent(
+    [property: JsonPropertyName("orderId")] int OrderId,
+    [property: JsonPropertyName("reason")] string Reason,
+    [property: JsonPropertyName("failedItems")] List<FailedItem> FailedItems,
+    [property: JsonPropertyName("failedAt")] DateTimeOffset FailedAt
+);
 
-public class FailedItem
-{
-    public int ProductId { get; set; }
-    public int RequestedQuantity { get; set; }
-    public int AvailableQuantity { get; set; }
-}
+public record FailedItem(
+    [property: JsonPropertyName("productId")] int ProductId,
+    [property: JsonPropertyName("requestedQuantity")] int RequestedQuantity,
+    [property: JsonPropertyName("availableQuantity")] int AvailableQuantity
+);

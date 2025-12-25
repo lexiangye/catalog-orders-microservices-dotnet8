@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace CatalogOrders.Shared.Events;
 
 /// <summary>
@@ -5,15 +7,13 @@ namespace CatalogOrders.Shared.Events;
 /// Pubblicato da: CatalogService
 /// Ascoltato da: OrderService (per confermare ordine)
 /// </summary>
-public class StockReservedEvent
-{
-    public int OrderId { get; set; }
-    public List<ReservedItem> ReservedItems { get; set; } = new();
-    public DateTimeOffset ReservedAt { get; set; }
-}
+public record StockReservedEvent(
+    [property: JsonPropertyName("orderId")] int OrderId,
+    [property: JsonPropertyName("reservedItems")] List<ReservedItem> ReservedItems,
+    [property: JsonPropertyName("reservedAt")] DateTimeOffset ReservedAt
+);
 
-public class ReservedItem
-{
-    public int ProductId { get; set; }
-    public int QuantityReserved { get; set; }
-}
+public record ReservedItem(
+    [property: JsonPropertyName("productId")] int ProductId,
+    [property: JsonPropertyName("quantityReserved")] int QuantityReserved
+);
