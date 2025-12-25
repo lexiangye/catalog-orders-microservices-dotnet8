@@ -3,6 +3,9 @@
 
 namespace CatalogOrders.Shared.Contracts;
 
+/// <summary>
+/// Formato standard per errori API
+/// </summary>
 public class ErrorResponse
 {
     public string ErrorCode { get; set; } = string.Empty;

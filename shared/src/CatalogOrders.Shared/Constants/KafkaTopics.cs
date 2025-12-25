@@ -2,6 +2,9 @@
 
 namespace CatalogOrders.Shared.Constants;
 
+/// <summary>
+/// Nomi dei topic Kafka (evita stringhe magiche nel codice)
+/// </summary>
 public static class KafkaTopics
 {
     // Topic per eventi del ciclo di vita degli ordini

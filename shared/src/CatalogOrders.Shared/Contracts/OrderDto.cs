@@ -4,6 +4,9 @@ namespace CatalogOrders.Shared.Contracts;
 
 using CatalogOrders.Shared.Enums;
 
+/// <summary>
+/// DTO completo di un ordine (usato nelle API)
+/// </summary>
 public class OrderDto
 {
     public int Id { get; set; }
@@ -13,7 +16,10 @@ public class OrderDto
     // Lista delle righe d'ordine
     public List<OrderLineDto> Lines { get; set; } = new();
     
-    // Totale calcolato sommando tutte le righe
+    
+    /// <summary>
+    /// Totale ordine (calcolato sommando le righe)
+    /// </summary>
     public decimal TotalAmount => Lines.Sum(l => l.TotalPrice);
 }
 

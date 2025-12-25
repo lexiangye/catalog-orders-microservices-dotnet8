@@ -2,9 +2,12 @@
 
 namespace CatalogOrders.Shared.Enums;
 
+/// <summary>
+/// Stati possibili di un ordine durante il suo ciclo di vita
+/// </summary>
 public enum OrderStatus
 {
-    Pending = 0,      // Ordine appena creato, in attesa di conferma stock
+    Pending = 0,      // Ordine creato, in attesa di conferma stock
     Confirmed = 1,    // Stock riservato con successo, ordine confermato
     Rejected = 2,     // Stock insufficiente, ordine rifiutato
     Cancelled = 3     // Ordine cancellato dall'utente (per compensazione)

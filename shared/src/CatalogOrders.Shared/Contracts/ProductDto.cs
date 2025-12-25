@@ -1,6 +1,8 @@
-﻿namespace CatalogOrders.Shared;
+﻿namespace CatalogOrders.Shared.Contracts;
 
-// Prodotto del catalogo
+/// <summary>
+/// DTO per trasferire informazioni sul prodotto via HTTP
+/// </summary>
 public class ProductDto
 {
     public int Id { get; set; }                         // Id del prodotto
