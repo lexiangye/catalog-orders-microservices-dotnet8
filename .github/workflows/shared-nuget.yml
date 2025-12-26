@@ -27,7 +27,7 @@ jobs:
 
       # Crea il pacchetto .nupkg
       - name: Pack
-        run: dotnet pack shared/CatalogOrders.Shared/CatalogOrders.Shared.csproj --configuration Release --output ./nupkgs
+        run: dotnet pack shared/src/CatalogOrders.Shared/CatalogOrders.Shared.csproj --configuration Release --output ./nupkgs
 
       # Pubblica su GitHub Packages
       - name: Push to GitHub Packages
