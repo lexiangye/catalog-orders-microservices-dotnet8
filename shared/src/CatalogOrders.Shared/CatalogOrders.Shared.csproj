@@ -9,7 +9,7 @@
 
         <!-- Metadati del pacchetto NuGet -->
         <PackageId>CatalogOrders.Shared</PackageId>
-        <Version>1.0.0</Version>
+        <Version>1.0.1</Version>
         <Authors>Lexiang Ye</Authors>
         <Company>Università di Parma</Company>
         <Description>Contratti ed eventi condivisi tra CatalogService e OrderService per architettura a microservizi</Description>
