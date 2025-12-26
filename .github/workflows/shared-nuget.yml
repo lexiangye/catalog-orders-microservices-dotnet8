@@ -1,0 +1,38 @@
+name: Publish Shared NuGet Package
+
+on:
+  push:
+    branches: [ "main" ]
+    # IMPORTANTE: Questo workflow parte SOLO se modifichi file dentro la cartella Shared
+    paths: [ "shared/**" ]
+  workflow_dispatch: # Ti permette di lanciarlo manualmente se serve
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    # Permessi necessari per scrivere nel registro pacchetti
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # Crea il pacchetto .nupkg
+      - name: Pack
+        run: dotnet pack shared/CatalogOrders.Shared/CatalogOrders.Shared.csproj --configuration Release --output ./nupkgs
+
+      # Pubblica su GitHub Packages
+      - name: Push to GitHub Packages
+        run: |
+          dotnet nuget push ./nupkgs/*.nupkg \
+            --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json \
+            --api-key ${{ secrets.GITHUB_TOKEN }} \
+            --skip-duplicate

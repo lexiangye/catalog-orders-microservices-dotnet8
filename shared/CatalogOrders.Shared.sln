@@ -4,12 +4,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B1A08755-3CD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatalogOrders.Shared", "src\CatalogOrders.Shared\CatalogOrders.Shared.csproj", "{6A9FC9A9-1D89-4D0B-9C09-FBDF21EACDCF}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dtos", "Dtos", "{D1C59F58-BCFB-4D5C-AEB8-5C41FA42E701}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Events", "Events", "{3D40F487-7995-45F8-AD62-B5EDF1D87E71}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Errors", "Errors", "{2E2BF8CD-B08B-4633-A278-AE9FFE1E5E87}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,9 +11,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6A9FC9A9-1D89-4D0B-9C09-FBDF21EACDCF} = {B1A08755-3CD4-4002-84A0-6BC7A6D11451}
-		{D1C59F58-BCFB-4D5C-AEB8-5C41FA42E701} = {B1A08755-3CD4-4002-84A0-6BC7A6D11451}
-		{3D40F487-7995-45F8-AD62-B5EDF1D87E71} = {B1A08755-3CD4-4002-84A0-6BC7A6D11451}
-		{2E2BF8CD-B08B-4633-A278-AE9FFE1E5E87} = {B1A08755-3CD4-4002-84A0-6BC7A6D11451}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{6A9FC9A9-1D89-4D0B-9C09-FBDF21EACDCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

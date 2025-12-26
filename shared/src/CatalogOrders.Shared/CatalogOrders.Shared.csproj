@@ -1,9 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <!-- Configurazione base -->
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+
+        <!-- Metadati del pacchetto NuGet -->
+        <PackageId>CatalogOrders.Shared</PackageId>
+        <Version>1.0.0</Version>
+        <Authors>Lexiang Ye</Authors>
+        <Company>Università di Parma</Company>
+        <Description>Contratti ed eventi condivisi tra CatalogService e OrderService per architettura a microservizi</Description>
+        
+        <!-- Repository (per source link) -->
+        <RepositoryUrl>https://github.com/lexiangye/catalog-orders-microservices-dotnet8</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        
+        <!-- Documentazione XML per IntelliSense -->
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);CS1591</NoWarn> <!-- Disabilita warning per XML doc mancanti -->
     </PropertyGroup>
 
+    <!-- Serializzazione JSON -->
+    <ItemGroup>
+        <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    </ItemGroup>
+    
 </Project>
