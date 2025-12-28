@@ -8,8 +8,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatalogService.Business", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatalogService.Repository", "src\CatalogService.Repository\CatalogService.Repository.csproj", "{2A240656-8C6C-4547-8B51-E5D348C7FD36}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatalogService.ClientHttp", "src\CatalogService.ClientHttp\CatalogService.ClientHttp.csproj", "{6802AC30-E631-4113-B5EF-FC459CE9220D}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,7 +17,6 @@ Global
 		{92BD4E34-61AD-413E-8552-15BE0F52E456} = {73EB6CAF-116C-4A50-B64E-1300856EF8DA}
 		{8EBD76B9-8ADB-44A4-88F4-955934213E45} = {73EB6CAF-116C-4A50-B64E-1300856EF8DA}
 		{2A240656-8C6C-4547-8B51-E5D348C7FD36} = {73EB6CAF-116C-4A50-B64E-1300856EF8DA}
-		{6802AC30-E631-4113-B5EF-FC459CE9220D} = {73EB6CAF-116C-4A50-B64E-1300856EF8DA}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{92BD4E34-61AD-413E-8552-15BE0F52E456}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -34,9 +31,5 @@ Global
 		{2A240656-8C6C-4547-8B51-E5D348C7FD36}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A240656-8C6C-4547-8B51-E5D348C7FD36}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A240656-8C6C-4547-8B51-E5D348C7FD36}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6802AC30-E631-4113-B5EF-FC459CE9220D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6802AC30-E631-4113-B5EF-FC459CE9220D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6802AC30-E631-4113-B5EF-FC459CE9220D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6802AC30-E631-4113-B5EF-FC459CE9220D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
