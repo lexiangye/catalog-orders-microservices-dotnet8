@@ -18,9 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CatalogService.Business\CatalogService.Business.csproj" />
-    
-    <!-- Durante la compilazione di WebApi verrà portato dentro anche l’assembly di Repository come 
-         riferimento “transitivo” -->
+    <ProjectReference Include="..\CatalogService.Repository\CatalogService.Repository.csproj" />
   </ItemGroup>
 
 </Project>
