@@ -1,4 +1,6 @@
 using CatalogService.Repository.Data;
+using CatalogService.Repository.Interfaces;
+using CatalogService.Repository.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +20,12 @@ builder.Services.AddSwaggerGen();
 var connectionString = builder.Configuration.GetConnectionString("CatalogConnection");
 builder.Services.AddDbContext<CatalogDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
+// Registrazione Repository Pattern
+// "Scoped" significa che viene creato un nuovo repository per ogni richiesta HTTP.
+// È il ciclo di vita corretto perché il DbContext è anch'esso Scoped.
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
 
 // ==========================================
 // 2. COSTRUZIONE DELL'APP
