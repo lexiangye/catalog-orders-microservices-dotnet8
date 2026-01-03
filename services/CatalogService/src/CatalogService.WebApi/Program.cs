@@ -1,6 +1,8 @@
 using CatalogService.Repository.Data;
 using CatalogService.Repository.Interfaces;
 using CatalogService.Repository.Repositories;
+using CatalogService.Business.Interfaces;
+using CatalogService.Business.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +28,8 @@ builder.Services.AddDbContext<CatalogDbContext>(options =>
 // È il ciclo di vita corretto perché il DbContext è anch'esso Scoped.
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
+// Registrazione Business Logic
+builder.Services.AddScoped<ICatalogService, CatalogService.Business.Services.CatalogService>();
 
 // ==========================================
 // 2. COSTRUZIONE DELL'APP
