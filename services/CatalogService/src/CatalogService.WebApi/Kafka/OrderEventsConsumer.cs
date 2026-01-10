@@ -6,9 +6,6 @@ using Confluent.Kafka;
 
 namespace CatalogService.WebApi.Kafka;
 
-/// <summary>
-/// HostedService che consuma eventi Kafka (infrastruttura in WebApi)
-/// </summary>
 public class OrderEventsConsumer : BackgroundService
 {
     private readonly IServiceScopeFactory _scopeFactory;
@@ -29,16 +26,15 @@ public class OrderEventsConsumer : BackgroundService
             BootstrapServers = configuration["Kafka:BootstrapServers"] ?? "localhost:9092",
             GroupId = "catalog-service-group",
             AutoOffsetReset = AutoOffsetReset.Earliest,
-            EnableAutoCommit = false
+            EnableAutoCommit = true // Semplificato: auto-commit
         };
         _consumer = new ConsumerBuilder<string, string>(config).Build();
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _consumer.Subscribe(new[] { KafkaTopics.OrderCreated, KafkaTopics.OrderCancelled });
-        _logger.LogInformation("Subscribed to topics: {Topics}", 
-            string.Join(", ", KafkaTopics.OrderCreated, KafkaTopics.OrderCancelled));
+        _consumer.Subscribe([KafkaTopics.OrderCreated, KafkaTopics.OrderCancelled]);
+        _logger.LogInformation("📡 Subscribed to Kafka topics");
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -47,41 +43,28 @@ public class OrderEventsConsumer : BackgroundService
                 var result = _consumer.Consume(stoppingToken);
                 if (result?.Message?.Value is null) continue;
 
-                _logger.LogDebug("Received message from {Topic}", result.Topic);
-
                 using var scope = _scopeFactory.CreateScope();
                 var stockService = scope.ServiceProvider.GetRequiredService<IStockService>();
 
-                await ProcessMessageAsync(result.Topic, result.Message.Value, stockService);
-                
-                _consumer.Commit(result);
-            }
-            catch (ConsumeException ex)
-            {
-                _logger.LogError(ex, "Kafka consume error");
+                switch (result.Topic)
+                {
+                    case KafkaTopics.OrderCreated:
+                        var created = JsonSerializer.Deserialize<EventEnvelope<OrderCreatedEvent>>(result.Message.Value, _jsonOptions);
+                        if (created is not null)
+                            await stockService.HandleOrderCreatedAsync(created.Payload);
+                        break;
+
+                    case KafkaTopics.OrderCancelled:
+                        var cancelled = JsonSerializer.Deserialize<EventEnvelope<OrderCancelledEvent>>(result.Message.Value, _jsonOptions);
+                        if (cancelled is not null)
+                            await stockService.HandleOrderCancelledAsync(cancelled.Payload);
+                        break;
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing message");
+                _logger.LogError(ex, "Error processing Kafka message");
             }
-        }
-    }
-
-    private async Task ProcessMessageAsync(string topic, string message, IStockService stockService)
-    {
-        switch (topic)
-        {
-            case KafkaTopics.OrderCreated:
-                var createdEnvelope = JsonSerializer.Deserialize<EventEnvelope<OrderCreatedEvent>>(message, _jsonOptions);
-                if (createdEnvelope is not null)
-                    await stockService.HandleOrderCreatedAsync(createdEnvelope.EventId, createdEnvelope.Payload);
-                break;
-
-            case KafkaTopics.OrderCancelled:
-                var cancelledEnvelope = JsonSerializer.Deserialize<EventEnvelope<OrderCancelledEvent>>(message, _jsonOptions);
-                if (cancelledEnvelope is not null)
-                    await stockService.HandleOrderCancelledAsync(cancelledEnvelope.EventId, cancelledEnvelope.Payload);
-                break;
         }
     }
 

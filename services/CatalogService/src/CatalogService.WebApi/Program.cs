@@ -27,7 +27,6 @@ builder.Services.AddDbContext<CatalogDbContext>(options =>
 // === REPOSITORY (Scoped) ===
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IStockRepository, StockRepository>();
-builder.Services.AddScoped<IProcessedEventRepository, ProcessedEventRepository>();
 
 // === BUSINESS SERVICES (Scoped) ===
 builder.Services.AddScoped<ICatalogService, CatalogService.Business.Services.CatalogService>();

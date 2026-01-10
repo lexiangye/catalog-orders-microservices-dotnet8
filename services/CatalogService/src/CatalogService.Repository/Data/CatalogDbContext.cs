@@ -11,7 +11,6 @@ public class CatalogDbContext : DbContext
 
     public DbSet<Product> Products { get; set; }
     public DbSet<Stock> Stocks { get; set; }
-    public DbSet<ProcessedEvent> ProcessedEvents { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -45,20 +44,7 @@ public class CatalogDbContext : DbContext
                   .OnDelete(DeleteBehavior.Cascade); // Se cancello il prodotto, sparisce lo stock
         });
 
-        // === CONFIGURAZIONE PROCESSED EVENT ===
-        modelBuilder.Entity<ProcessedEvent>(entity =>
-        {
-            entity.HasKey(e => e.EventId);
-            
-            entity.Property(e => e.EventType)
-                .IsRequired()
-                .HasMaxLength(100);
-            
-            // ProcessedAt viene mappato automaticamente, non serve configurazione extra
-        });
-
         // === SEEDING DEI DATI ===
-        // Nota: Quando usi HasData, devi specificare manualmente gli ID
         modelBuilder.Entity<Product>().HasData(
             new Product { Id = 1, Name = "Logitech MX Master 3", Price = 99.99m, Description = "Mouse ergonomico" },
             new Product { Id = 2, Name = "Keychron K2", Price = 89.99m, Description = "Tastiera meccanica" }
