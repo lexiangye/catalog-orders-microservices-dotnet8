@@ -3,6 +3,7 @@ using CatalogService.Repository.Interfaces;
 using CatalogService.Repository.Repositories;
 using CatalogService.Business.Interfaces;
 using CatalogService.Business.Services;
+using CatalogService.WebApi.Kafka;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,18 +19,23 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configurazione Database MySQL
+// === DATABASE ===
 var connectionString = builder.Configuration.GetConnectionString("CatalogConnection");
 builder.Services.AddDbContext<CatalogDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-// Registrazione Repository Pattern
-// "Scoped" significa che viene creato un nuovo repository per ogni richiesta HTTP.
-// È il ciclo di vita corretto perché il DbContext è anch'esso Scoped.
+// === REPOSITORY (Scoped) ===
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IStockRepository, StockRepository>();
+builder.Services.AddScoped<IProcessedEventRepository, ProcessedEventRepository>();
 
-// Registrazione Business Logic
+// === BUSINESS SERVICES (Scoped) ===
 builder.Services.AddScoped<ICatalogService, CatalogService.Business.Services.CatalogService>();
+builder.Services.AddScoped<IStockService, StockService>();
+
+// === KAFKA (Singleton per producer, HostedService per consumer) ===
+builder.Services.AddSingleton<IEventPublisher, KafkaEventPublisher>();
+builder.Services.AddHostedService<OrderEventsConsumer>();
 
 // ==========================================
 // 2. COSTRUZIONE DELL'APP
@@ -39,8 +45,7 @@ var app = builder.Build();
 // ==========================================
 // 3. PIPELINE HTTP (Middleware)
 // ==========================================
-
-// Abilita Swagger sia in dev che in prod (utile per l'esame)
+// Abilita Swagger sia in dev che in prod
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
