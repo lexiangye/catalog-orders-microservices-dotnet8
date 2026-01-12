@@ -4,6 +4,15 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+    <!-- CONFIGURAZIONE NUGET -->
+    <PackageId>CatalogService.ClientHttp</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Lexiang Ye</Authors>
+    <Company>Università di Parma</Company>
+    <Description>Client HTTP per CatalogService con Circuit Breaker e Retry</Description>
+    <RepositoryUrl>https://github.com/lexiangye/catalog-orders-microservices-dotnet8</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
