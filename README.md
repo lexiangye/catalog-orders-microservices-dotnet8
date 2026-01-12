@@ -73,6 +73,15 @@ Per eseguirlo in locale servono:
 - **Docker** + **Docker Compose v2**
 - (opzionale, per sviluppo senza Docker) **.NET SDK 8**
 
+### ⚠️ Configurazione Iniziale (NuGet)
+
+Questo progetto utilizza pacchetti privati ospitati su **GitHub Packages**. Per effettuare il restore delle dipendenze, è necessario autenticarsi configurando le seguenti **Variabili d'Ambiente** sul proprio sistema:
+
+1. **`GITHUB_USER`**: Il tuo username GitHub.
+2. **`GITHUB_TOKEN`**: Un tuo **Personal Access Token (PAT)** (Classic) con permesso `read:packages`.
+
+> **Nota:** Non inserire credenziali nel codice. Il file `nuget.config` leggerà automaticamente queste variabili dal tuo sistema operativo.
+
 ---
 
 ## Avvio in locale (consigliato)
