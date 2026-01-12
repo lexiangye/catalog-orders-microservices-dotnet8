@@ -1,48 +1,79 @@
-Console.WriteLine("AAA");
-
+using CatalogService.Repository.Data;
+using CatalogService.Repository.Interfaces;
+using CatalogService.Repository.Repositories;
+using CatalogService.Business.Interfaces;
+using CatalogService.Business.Services;
+using CatalogService.WebApi.Kafka;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// ==========================================
+// 1. CONFIGURAZIONE DEI SERVIZI (DI)
+// ==========================================
+
+// Abilita i Controller (fondamentale per la nostra architettura)
+builder.Services.AddControllers();
+
+// Configurazione Swagger/OpenAPI (per testare le API)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// === DATABASE ===
+var connectionString = builder.Configuration.GetConnectionString("CatalogConnection");
+builder.Services.AddDbContext<CatalogDbContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
+// === REPOSITORY (Scoped) ===
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IStockRepository, StockRepository>();
+
+// === BUSINESS SERVICES (Scoped) ===
+builder.Services.AddScoped<ICatalogService, CatalogService.Business.Services.CatalogService>();
+builder.Services.AddScoped<IStockService, StockService>();
+
+// === KAFKA (Singleton per producer, HostedService per consumer) ===
+builder.Services.AddSingleton<IEventPublisher, KafkaEventPublisher>();
+builder.Services.AddHostedService<OrderEventsConsumer>();
+
+// ==========================================
+// 2. COSTRUZIONE DELL'APP
+// ==========================================
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// ==========================================
+// 3. PIPELINE HTTP (Middleware)
+// ==========================================
+// Abilita Swagger sia in dev che in prod
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseAuthorization();
 
-var summaries = new[]
+// Mappa le rotte dei Controller
+app.MapControllers();
+
+// ==========================================
+// 4. MIGRATION AUTOMATICA (Avvio)
+// ==========================================
+// Applica le modifiche al DB appena il container parte
+using (var scope = app.Services.CreateScope())
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
-
-app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<CatalogDbContext>();
+        // Crea il DB e le tabelle se non esistono
+        context.Database.Migrate();
+        Console.WriteLine("✅ Database migration applied successfully.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ An error occurred while migrating the database: {ex.Message}");
+    }
 }
 
+app.Run();

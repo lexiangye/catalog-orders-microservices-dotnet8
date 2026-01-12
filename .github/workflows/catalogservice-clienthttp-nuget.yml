@@ -1,0 +1,36 @@
+name: Publish CatalogService.ClientHttp NuGet
+
+on:
+  push:
+    branches: [ "main" ]
+    paths: [ "services/CatalogService/src/CatalogService.ClientHttp/**" ]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+          
+      # Crea il pacchetto .nupkg
+      - name: Pack
+        run: dotnet pack services/CatalogService/src/CatalogService.ClientHttp/CatalogService.ClientHttp.csproj --configuration Release --output ./nupkgs
+
+      # Pubblica su GitHub Packages
+      - name: Push to GitHub Packages
+        run: |
+          dotnet nuget push ./nupkgs/*.nupkg \
+            --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json \
+            --api-key ${{ secrets.GITHUB_TOKEN }} \
+            --skip-duplicate
