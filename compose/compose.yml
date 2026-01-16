@@ -7,7 +7,7 @@ services:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: catalogDb
     ports:
-      - "3306:3306" # Mappato su localhost per permetterti di connetterti da Rider
+      - "3306:3306"
     volumes:
       - catalog-db-data:/var/lib/mysql
     healthcheck:
@@ -15,7 +15,24 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-  
+
+  # === DATABASE di OrderService ===
+  order-db:
+    image: mysql:8.0
+    container_name: order-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: orderDb
+    ports:
+      - "3307:3306"
+    volumes:
+      - order-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # === ZOOKEEPER ===
   zookeeper:
     image: confluentinc/cp-zookeeper:7.7.0
@@ -25,7 +42,7 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "2181:2181"
-  
+
   # === KAFKA ===
   kafka:
     image: confluentinc/cp-kafka:7.7.0
@@ -55,3 +72,4 @@ services:
 
 volumes:
   catalog-db-data:
+  order-db-data:
