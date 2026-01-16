@@ -1,3 +1,4 @@
+
 services:
   # === DATABASE di CatalogService ===
   catalog-db:
@@ -69,6 +70,52 @@ services:
 
       # Per sviluppare in locale senza ACL
       KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # === CATALOG SERVICE ===
+  catalogservice:
+    build:
+      context: ../services/CatalogService
+      dockerfile: src/CatalogService.WebApi/Dockerfile
+    container_name: catalogservice
+    ports:
+      - "5052:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__CatalogConnection: "Server=catalog-db;Port=3306;Database=catalogDb;User=root;Password=rootpassword;"
+      Kafka__BootstrapServers: "kafka:29092"
+    depends_on:
+      catalog-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    restart: on-failure
+
+  # === ORDER SERVICE ===
+  orderservice:
+    build:
+      context: ../services/OrderService
+      dockerfile: src/OrderService.WebApi/Dockerfile
+    container_name: orderservice
+    ports:
+      - "5053:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__OrderConnection: "Server=order-db;Port=3306;Database=orderDb;User=root;Password=rootpassword;"
+      Kafka__BootstrapServers: "kafka:29092"
+      CatalogService__BaseUrl: "http://catalogservice:8080"
+    depends_on:
+      order-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      catalogservice:
+        condition: service_started
+    restart: on-failure
 
 volumes:
   catalog-db-data:
