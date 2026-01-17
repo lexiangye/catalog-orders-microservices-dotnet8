@@ -88,6 +88,7 @@ public class StockEventsConsumer : BackgroundService
             {
                 // Logga errori ma continua il loop (così il consumer non muore)
                 _logger.LogError(ex, "Error processing Kafka message");
+                await Task.Delay(5000, stoppingToken);
             }
         }
     }

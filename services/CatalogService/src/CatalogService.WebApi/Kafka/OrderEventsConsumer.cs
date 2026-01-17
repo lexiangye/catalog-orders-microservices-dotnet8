@@ -64,6 +64,7 @@ public class OrderEventsConsumer : BackgroundService
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing Kafka message");
+                await Task.Delay(5000, stoppingToken);
             }
         }
     }
