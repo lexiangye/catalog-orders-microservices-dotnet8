@@ -46,6 +46,9 @@ jobs:
           context: .
           file: ${{ matrix.service.dockerfile }}
           push: true
+          build-args: |
+            GITHUB_USER=${{ github.actor }}
+            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
           tags: |
             ghcr.io/${{ github.repository }}/${{ matrix.service.name }}:latest
             ghcr.io/${{ github.repository }}/${{ matrix.service.name }}:${{ github.sha }}
