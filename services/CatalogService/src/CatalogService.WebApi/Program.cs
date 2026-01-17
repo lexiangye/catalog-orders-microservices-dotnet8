@@ -45,16 +45,10 @@ var app = builder.Build();
 // 3. PIPELINE HTTP (Middleware)
 // ==========================================
 // Abilita Swagger sia in dev che in prod
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseAuthorization();
-
-// Mappa le rotte dei Controller
-app.MapControllers();
+app.MapControllers(); // mappa le rotte dei Controller
 
 // ==========================================
 // 4. MIGRATION AUTOMATICA (Avvio)
