@@ -1,3 +1,4 @@
+
 services:
   # === DATABASE di CatalogService ===
   catalog-db:
@@ -7,7 +8,7 @@ services:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: catalogDb
     ports:
-      - "3306:3306" # Mappato su localhost per permetterti di connetterti da Rider
+      - "3306:3306"
     volumes:
       - catalog-db-data:/var/lib/mysql
     healthcheck:
@@ -15,7 +16,24 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-  
+
+  # === DATABASE di OrderService ===
+  order-db:
+    image: mysql:8.0
+    container_name: order-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: orderDb
+    ports:
+      - "3307:3306"
+    volumes:
+      - order-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # === ZOOKEEPER ===
   zookeeper:
     image: confluentinc/cp-zookeeper:7.7.0
@@ -25,7 +43,7 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "2181:2181"
-  
+
   # === KAFKA ===
   kafka:
     image: confluentinc/cp-kafka:7.7.0
@@ -44,14 +62,65 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
-
-      # Partizioni minime di replication (per ambiente singolo)
+      
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-
-      # Per sviluppare in locale senza ACL
       KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # === CATALOG SERVICE ===
+  catalogservice:
+    build:
+      context: ..
+      dockerfile: services/CatalogService/src/CatalogService.WebApi/Dockerfile
+      args:
+        GITHUB_USER: ${GITHUB_USER}
+        GITHUB_TOKEN: ${GITHUB_TOKEN}
+    container_name: catalogservice
+    ports:
+      - "5052:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__CatalogConnection: "Server=catalog-db;Port=3306;Database=catalogDb;User=root;Password=rootpassword;"
+      Kafka__BootstrapServers: "kafka:29092"
+    depends_on:
+      catalog-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    restart: on-failure
+
+  # === ORDER SERVICE ===
+  orderservice:
+    build:
+      context: ..
+      dockerfile: services/OrderService/src/OrderService.WebApi/Dockerfile
+      args:
+        GITHUB_USER: ${GITHUB_USER}
+        GITHUB_TOKEN: ${GITHUB_TOKEN}
+    container_name: orderservice
+    ports:
+      - "5053:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__OrderConnection: "Server=order-db;Port=3306;Database=orderDb;User=root;Password=rootpassword;"
+      Kafka__BootstrapServers: "kafka:29092"
+      CatalogService__BaseUrl: "http://catalogservice:8080"
+    depends_on:
+      order-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      catalogservice:
+        condition: service_started
+    restart: on-failure
 
 volumes:
   catalog-db-data:
+  order-db-data:

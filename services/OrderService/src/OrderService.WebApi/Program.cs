@@ -1,44 +1,80 @@
+
+using CatalogService.ClientHttp;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Http.Resilience;
+using OrderService.Business.Interfaces;
+using OrderService.Business.Services;
+using OrderService.Repository.Data;
+using OrderService.Repository.Interfaces;
+using OrderService.Repository.Repositories;
+using OrderService.WebApi.Kafka;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// ==========================================
+// 1. CONFIGURAZIONE DEI SERVIZI (DI)
+// ==========================================
+
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// === DATABASE ===
+var connectionString = builder.Configuration.GetConnectionString("OrderConnection");
+builder.Services.AddDbContext<OrderDbContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
+// === REPOSITORY ===
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+
+// === BUSINESS SERVICES ===
+builder.Services.AddScoped<IOrderService, OrderService.Business.Services.OrderService>();
+builder.Services.AddScoped<IStockEventHandler, StockEventHandler>();
+
+// === HTTP CLIENT con Circuit Breaker (CatalogService) ===
+builder.Services.AddHttpClient<ICatalogServiceClient, CatalogServiceClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["CatalogService:BaseUrl"] ?? "http://localhost:5052");
+})
+.AddStandardResilienceHandler();
+
+// === KAFKA ===
+builder.Services.AddSingleton<IEventPublisher, KafkaEventPublisher>();
+builder.Services.AddHostedService<StockEventsConsumer>();
+
+// ==========================================
+// 2. COSTRUZIONE DELL'APP
+// ==========================================
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// ==========================================
+// 3. PIPELINE HTTP
+// ==========================================
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
 
-var summaries = new[]
+// ==========================================
+// 4. MIGRATION AUTOMATICA
+// ==========================================
+using (var scope = app.Services.CreateScope())
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
+    var services = scope.ServiceProvider;
+    try
     {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast")
-    .WithOpenApi();
+        var context = services.GetRequiredService<OrderDbContext>();
+        context.Database.Migrate();
+        Console.WriteLine("✅ OrderService database migration applied successfully.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ An error occurred while migrating the database: {ex.Message}");
+    }
+}
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
