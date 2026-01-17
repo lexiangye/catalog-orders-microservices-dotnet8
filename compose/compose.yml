@@ -79,8 +79,11 @@ services:
   # === CATALOG SERVICE ===
   catalogservice:
     build:
-      context: ../services/CatalogService
-      dockerfile: src/CatalogService.WebApi/Dockerfile
+      context: ..
+      dockerfile: services/CatalogService/src/CatalogService.WebApi/Dockerfile
+      args:
+        GITHUB_USER: ${GITHUB_USER}
+        GITHUB_TOKEN: ${GITHUB_TOKEN}
     container_name: catalogservice
     ports:
       - "5052:8080"
@@ -98,8 +101,11 @@ services:
   # === ORDER SERVICE ===
   orderservice:
     build:
-      context: ../services/OrderService
-      dockerfile: src/OrderService.WebApi/Dockerfile
+      context: ..
+      dockerfile: services/OrderService/src/OrderService.WebApi/Dockerfile
+      args:
+        GITHUB_USER: ${GITHUB_USER}
+        GITHUB_TOKEN: ${GITHUB_TOKEN}
     container_name: orderservice
     ports:
       - "5053:8080"
