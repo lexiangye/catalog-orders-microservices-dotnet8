@@ -76,12 +76,7 @@ services:
 
   # === CATALOG SERVICE ===
   catalogservice:
-    build:
-      context: ..
-      dockerfile: services/CatalogService/src/CatalogService.WebApi/Dockerfile
-      args:
-        GITHUB_USER: ${GITHUB_USER}
-        GITHUB_TOKEN: ${GITHUB_TOKEN}
+    image: ghcr.io/lexiangye/catalog-orders-microservices-dotnet8/catalogservice:latest
     container_name: catalogservice
     ports:
       - "5052:8080"
@@ -98,12 +93,7 @@ services:
 
   # === ORDER SERVICE ===
   orderservice:
-    build:
-      context: ..
-      dockerfile: services/OrderService/src/OrderService.WebApi/Dockerfile
-      args:
-        GITHUB_USER: ${GITHUB_USER}
-        GITHUB_TOKEN: ${GITHUB_TOKEN}
+    image: ghcr.io/lexiangye/catalog-orders-microservices-dotnet8/orderservice:latest
     container_name: orderservice
     ports:
       - "5053:8080"
