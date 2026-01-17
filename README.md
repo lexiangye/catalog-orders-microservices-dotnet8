@@ -11,6 +11,7 @@ Caratteristiche principali:
 - **Comunicazione asincrona Kafka** con **mini-saga coreografata**:
   - `OrderCreated` → `StockReserved` / `StockReservationFailed` → ordine `CONFIRMED` / `REJECTED`
   - (opzionale/extra) compensazione: `OrderCancelled` → rilascio scorte
+- **CI/CD**: Workflow automatici via GitHub Actions per la pubblicazione dei pacchetti NuGet e delle immagini Docker su GHCR.
 
 ---
 
@@ -73,9 +74,9 @@ Per eseguirlo in locale servono:
 - **Docker** + **Docker Compose v2**
 - (opzionale, per sviluppo senza Docker) **.NET SDK 8**
 
-### ⚠️ Configurazione Iniziale (NuGet)
+### Configurazione Iniziale (NuGet)
 
-Questo progetto utilizza pacchetti privati ospitati su **GitHub Packages**. Per effettuare il restore delle dipendenze, è necessario autenticarsi configurando le seguenti **Variabili d'Ambiente** sul proprio sistema:
+Questo progetto utilizza pacchetti ospitati su **GitHub Packages**. Per effettuare il restore delle dipendenze, è necessario autenticarsi configurando le seguenti **Variabili d'Ambiente** sul proprio sistema:
 
 1. **`GITHUB_USER`**: Il tuo username GitHub.
 2. **`GITHUB_TOKEN`**: Un tuo **Personal Access Token (PAT)** (Classic) con permesso `read:packages`.
@@ -84,7 +85,7 @@ Questo progetto utilizza pacchetti privati ospitati su **GitHub Packages**. Per 
 
 ---
 
-## Avvio in locale (consigliato)
+## Avvio in locale
 
 ### 1) Avvio completo con Docker Compose (sviluppo)
 
@@ -99,11 +100,9 @@ Attendi che:
 
 ### 2) Swagger / endpoint
 
-Apri Swagger dal browser (porte definite nel compose):
-- CatalogService: `http://localhost:<porta_catalog>/swagger`
-- OrderService: `http://localhost:<porta_order>/swagger`
-
-> Le porte esatte sono definite nei file `compose/*.yml`.
+Apri Swagger dal browser:
+- CatalogService: `http://localhost:5052/swagger`
+- OrderService: `http://localhost:5053/swagger`
 
 ### 3) Test rapido end-to-end (manuale)
 
