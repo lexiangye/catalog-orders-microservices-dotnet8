@@ -32,11 +32,10 @@ builder.Services.AddScoped<IOrderService, OrderService.Business.Services.OrderSe
 builder.Services.AddScoped<IStockEventHandler, StockEventHandler>();
 
 // === HTTP CLIENT con Circuit Breaker (CatalogService) ===
-builder.Services.AddHttpClient<ICatalogServiceClient, CatalogServiceClient>(client =>
+builder.Services.AddCatalogServiceClient(options =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["CatalogService:BaseUrl"] ?? "http://localhost:5052");
-})
-.AddStandardResilienceHandler();
+    options.BaseUrl = builder.Configuration["CatalogService:BaseUrl"] ?? "http://localhost:5052";
+});
 
 // === KAFKA ===
 builder.Services.AddSingleton<IEventPublisher, KafkaEventPublisher>();
