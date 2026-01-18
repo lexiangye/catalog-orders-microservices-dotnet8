@@ -8,7 +8,7 @@ namespace OrderService.Repository.Repositories;
 
 // Implementazione concreta di IOrderRepository. In pratica è la classe che verrà utilizzata per interagire con il
 // DB MySQL usando EF Core (OrderDbContext) per fare CRUD sugli ordini. 
-/// <inheritdoc />
+/// <inheritdoc cref="IOrderRepository"/>
 public class OrderRepository(OrderDbContext context) : IOrderRepository
 {
     /// <inheritdoc />

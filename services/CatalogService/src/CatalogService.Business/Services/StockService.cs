@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CatalogService.Business.Services;
 
-/// <inheritdoc />
+/// <inheritdoc cref="IStockService"/>
 public class StockService(
     IStockRepository stockRepository,
     IEventPublisher eventPublisher,

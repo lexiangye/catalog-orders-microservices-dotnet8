@@ -5,7 +5,7 @@ using CatalogService.Repository.Interfaces;
 
 namespace CatalogService.Business.Services;
 
-/// <inheritdoc />
+/// <inheritdoc cref="ICatalogService"/>
 public class CatalogService(IProductRepository repository) : ICatalogService
 {
     /// <inheritdoc />
