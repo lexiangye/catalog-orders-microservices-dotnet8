@@ -2,14 +2,21 @@ using CatalogOrders.Shared.Events;
 
 namespace OrderService.Business.Interfaces;
 
-// Astrarre la pubblicazione degli eventi (Kafka) dietro un'interfaccia
-// permette al Business di non dipendere direttamente dal broker/libreria Kafka.
-// Così puoi testare il Business mockando questo publisher.
+/// <summary>
+/// Astrae il meccanismo di pubblicazione degli eventi verso l'esterno (es. Kafka).
+/// Permette al dominio Order di notificare cambiamenti di stato senza conoscere l'infrastruttura sottostante.
+/// </summary>
 public interface IEventPublisher
 {
-    // Pubblica l’evento “OrderCreated” per far partire la saga (Catalog scalerà lo stock)
+    /// <summary>
+    /// Invia una notifica di ordine creato per richiedere la prenotazione dello stock al CatalogService.
+    /// </summary>
+    /// <param name="evt">Dati dell'evento di creazione.</param>
     Task PublishOrderCreatedAsync(OrderCreatedEvent evt);
 
-    // Pubblica l’evento “OrderCancelled” per la compensazione/rollback (se usato nel tuo flusso)
+    /// <summary>
+    /// Invia una notifica di ordine cancellato per richiedere il rilascio dello stock precedentemente impegnato.
+    /// </summary>
+    /// <param name="evt">Dati dell'evento di cancellazione.</param>
     Task PublishOrderCancelledAsync(OrderCancelledEvent evt);
 }

@@ -5,22 +5,27 @@ using Microsoft.Extensions.Logging;
 
 namespace CatalogService.Business.Services;
 
+/// <inheritdoc cref="IStockService"/>
 public class StockService(
     IStockRepository stockRepository,
     IEventPublisher eventPublisher,
     ILogger<StockService> logger) : IStockService
 {
+    /// <inheritdoc />
     public async Task HandleOrderCreatedAsync(OrderCreatedEvent evt)
     {
         logger.LogInformation("Processing OrderCreated for Order {OrderId}", evt.OrderId);
 
-        // Converti items e tenta riserva stock
+        // Estrae solo le informazioni necessarie (ID e quantità) dall'evento di creazione ordine
         var itemsToReserve = evt.Items.Select(i => (i.ProductId, i.Quantity)).ToList();
+        
+        // Esegue la logica transazionale sul DB: o riserva tutto o niente
         var failedItems = await stockRepository.TryReserveStockAsync(itemsToReserve);
 
         // Pubblica evento risposta
         if (failedItems.Count == 0)
         {
+            // Se lo stock è disponibile, conferma la prenotazione al sistema ordini
             var reservedEvent = new StockReservedEvent(
                 evt.OrderId,
                 evt.Items.Select(i => new ReservedItem(i.ProductId, i.Quantity)).ToList(),
@@ -31,6 +36,7 @@ public class StockService(
         }
         else
         {
+            // Se mancano pezzi, notifica il fallimento specificando quali prodotti sono insufficienti
             var failedEvent = new StockReservationFailedEvent(
                 evt.OrderId,
                 "Insufficient stock",
@@ -42,6 +48,7 @@ public class StockService(
         }
     }
 
+    /// <inheritdoc />
     public async Task HandleOrderCancelledAsync(OrderCancelledEvent evt)
     {
         logger.LogInformation("Processing OrderCancelled for Order {OrderId}", evt.OrderId);
@@ -50,6 +57,7 @@ public class StockService(
         var itemsToRelease = evt.Items.Select(i => (i.ProductId, i.Quantity)).ToList();
         await stockRepository.ReleaseStockAsync(itemsToRelease);
 
+        // Conferma l'avvenuto rilascio tramite evento asincrono
         var releasedEvent = new StockReleasedEvent(
             evt.OrderId,
             evt.Items.Select(i => new ReleasedItem(i.ProductId, i.Quantity)).ToList(),

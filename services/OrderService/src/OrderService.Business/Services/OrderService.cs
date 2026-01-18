@@ -16,12 +16,14 @@ namespace OrderService.Business.Services;
 // - Repository per DB
 // - CatalogService.ClientHttp per validare/recuperare dati prodotto (chiamata sincrona)
 // - EventPublisher per pubblicare eventi Kafka (inizio/compensazione saga)
+/// <inheritdoc cref="IOrderService" />
 public class OrderService(
     IOrderRepository repository,
     ICatalogServiceClient catalogClient,
     IEventPublisher eventPublisher,
     ILogger<OrderService> logger) : IOrderService
 {
+    /// <inheritdoc />
     public async Task<IEnumerable<OrderDto>> GetOrdersAsync()
     {
         // Recupera dal DB e converte entità -> DTO
@@ -29,6 +31,7 @@ public class OrderService(
         return orders.Select(o => o.AsDto());
     }
 
+    /// <inheritdoc />
     public async Task<OrderDto?> GetOrderByIdAsync(int id)
     {
         // Recupera dal DB un ordine singolo e converte entità -> DTO
@@ -36,6 +39,7 @@ public class OrderService(
         return order?.AsDto();
     }
 
+    /// <inheritdoc />
     public async Task<OrderDto> CreateOrderAsync(CreateOrderDto dto)
     {
         // 1) Crea un nuovo ordine (stato iniziale di default: Pending)
@@ -79,6 +83,7 @@ public class OrderService(
         return order.AsDto();
     }
 
+    /// <inheritdoc />
     public async Task CancelOrderAsync(int id)
     {
         // Recupera l'ordine

@@ -5,9 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CatalogService.Repository.Repositories;
 
+/// <summary>
+/// Implementazione Entity Framework Core del repository prodotti.
+/// </summary>
+/// <param name="context">Il contesto del database.</param>
 public class ProductRepository(CatalogDbContext context) : IProductRepository
 {
-    // Lettura di tutti i Products
+    /// <inheritdoc />
     public async Task<IEnumerable<Product>> GetProductsAsync()
     {
         // AsNoTracking: Ottimizzazione per sola lettura (non traccia modifiche)
@@ -18,7 +22,7 @@ public class ProductRepository(CatalogDbContext context) : IProductRepository
             .ToListAsync();
     }
 
-    // Lettura di un Product tramite il suo Id
+    /// <inheritdoc />
     public async Task<Product?> GetProductByIdAsync(int id)
     {
         return await context.Products
@@ -26,21 +30,21 @@ public class ProductRepository(CatalogDbContext context) : IProductRepository
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    // Creazione di un Product
+    /// <inheritdoc />
     public async Task CreateProductAsync(Product product)
     {
         await context.Products.AddAsync(product);
         await context.SaveChangesAsync();
     }
 
-    // Aggiornamento di un Product
+    /// <inheritdoc />
     public async Task UpdateProductAsync(Product product)
     {
         context.Products.Update(product);
         await context.SaveChangesAsync();
     }
 
-    // Cancellazione di un Product
+    /// <inheritdoc />
     public async Task DeleteProductAsync(int id)
     {
         // Prima dobbiamo trovarlo

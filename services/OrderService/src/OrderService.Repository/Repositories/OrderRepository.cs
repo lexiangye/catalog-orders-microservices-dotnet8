@@ -8,8 +8,10 @@ namespace OrderService.Repository.Repositories;
 
 // Implementazione concreta di IOrderRepository. In pratica è la classe che verrà utilizzata per interagire con il
 // DB MySQL usando EF Core (OrderDbContext) per fare CRUD sugli ordini. 
+/// <inheritdoc cref="IOrderRepository"/>
 public class OrderRepository(OrderDbContext context) : IOrderRepository
 {
+    /// <inheritdoc />
     public async Task<IEnumerable<Order>> GetOrdersAsync()
     {
         return await context.Orders
@@ -19,6 +21,7 @@ public class OrderRepository(OrderDbContext context) : IOrderRepository
             .ToListAsync();
     }
 
+    /// <inheritdoc />
     public async Task<Order?> GetOrderByIdAsync(int id)
     {
         return await context.Orders
@@ -26,6 +29,7 @@ public class OrderRepository(OrderDbContext context) : IOrderRepository
             .FirstOrDefaultAsync(o => o.Id == id); // null se non trovato
     }
 
+    /// <inheritdoc />
     public async Task CreateOrderAsync(Order order)
     {
         // Inserisce un nuovo ordine (con relative righe se presenti)
@@ -33,6 +37,7 @@ public class OrderRepository(OrderDbContext context) : IOrderRepository
         await context.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
     public async Task UpdateOrderStatusAsync(int orderId, OrderStatus status)
     {
         // Cerca l'ordine per chiave primaria
@@ -45,6 +50,7 @@ public class OrderRepository(OrderDbContext context) : IOrderRepository
         }
     }
 
+    /// <inheritdoc />
     public async Task DeleteOrderAsync(int id)
     {
         // Rimuove l'ordine (le righe vengono eliminate per cascade delete)

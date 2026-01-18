@@ -6,9 +6,10 @@ using OrderService.Business.Interfaces;
 
 namespace OrderService.WebApi.Kafka;
 
-// BackgroundService = servizio in background che gira insieme alla WebApi.
-// Qui ascoltiamo Kafka per eventi di stock provenienti da CatalogService
-// e li inoltriamo al Business (IStockEventHandler).
+/// <summary>
+/// Worker di background che consuma eventi riguardanti lo stock dal broker Kafka.
+/// Ascolta gli esiti delle prenotazioni prodotti per aggiornare lo stato degli ordini (Saga Pattern).
+/// </summary>
 public class StockEventsConsumer : BackgroundService
 {
     // Serve per creare uno scope DI per ogni messaggio (così possiamo risolvere servizi scoped)
@@ -44,7 +45,11 @@ public class StockEventsConsumer : BackgroundService
         _consumer = new ConsumerBuilder<string, string>(config).Build();
     }
 
-    // Metodo principale del BackgroundService: gira finché l’app è viva
+    /// <summary>
+    /// Ciclo principale di esecuzione del consumatore. 
+    /// Gestisce l'iscrizione ai topic e il dispacciamento dei messaggi agli handler competenti.
+    /// </summary>
+    /// <param name="stoppingToken">Token per gestire lo shutdown pulito dell'applicazione.</param>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         // Iscrizione ai topic di interesse (eventi di stock)

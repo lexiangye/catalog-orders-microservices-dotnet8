@@ -14,6 +14,9 @@
     <RepositoryUrl>https://github.com/lexiangye/catalog-orders-microservices-dotnet8</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
 
+    <!-- Specifica il file README per il pacchetto NuGet -->
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+
     <!-- Genera il file XML per la documentazione IntelliSense -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <!-- Evita warning per i membri pubblici senza commenti -->
@@ -22,6 +25,11 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="8.10.0" />
+  </ItemGroup>
+
+  <!-- Include il file README.md nel pacchetto durante il comando 'dotnet pack' -->
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
 </Project>

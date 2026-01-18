@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CatalogService.Repository.Data;
 
+/// <summary>
+/// Contesto Entity Framework per il database del servizio Catalogo.
+/// </summary>
 public class CatalogDbContext : DbContext
 {
     public CatalogDbContext(DbContextOptions<CatalogDbContext> options) : base(options)
@@ -12,6 +15,9 @@ public class CatalogDbContext : DbContext
     public DbSet<Product> Products { get; set; }
     public DbSet<Stock> Stocks { get; set; }
 
+    /// <summary>
+    /// Configurazione del modello tramite Fluent API.
+    /// </summary>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

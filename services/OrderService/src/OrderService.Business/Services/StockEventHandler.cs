@@ -8,11 +8,13 @@ namespace OrderService.Business.Services;
 
 // Handler degli eventi di stock che arrivano dal CatalogService via Kafka.
 // In base all'esito della riserva aggiorna lo stato dell'ordine nel DB (parte della saga).
+/// <inheritdoc cref="IStockEventHandler" />
 public class StockEventHandler(
     IOrderRepository repository,
     ILogger<StockEventHandler> logger) : IStockEventHandler
 {
     // Evento positivo: il Catalog ha riservato lo stock per questo ordine
+    /// <inheritdoc />
     public async Task HandleStockReservedAsync(StockReservedEvent evt)
     {
         logger.LogInformation("📦 Stock reserved for Order {OrderId}", evt.OrderId);
@@ -24,6 +26,7 @@ public class StockEventHandler(
     }
 
     // Evento negativo: il Catalog non è riuscito a riservare lo stock
+    /// <inheritdoc />
     public async Task HandleStockReservationFailedAsync(StockReservationFailedEvent evt)
     {
         logger.LogWarning("❌ Stock reservation failed for Order {OrderId}: {Reason}",
