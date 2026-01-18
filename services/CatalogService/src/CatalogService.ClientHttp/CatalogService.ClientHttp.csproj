@@ -7,12 +7,17 @@
 
     <!-- CONFIGURAZIONE NUGET -->
     <PackageId>CatalogService.ClientHttp</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>Lexiang Ye</Authors>
     <Company>Università di Parma</Company>
     <Description>Client HTTP per CatalogService con Circuit Breaker e Retry</Description>
     <RepositoryUrl>https://github.com/lexiangye/catalog-orders-microservices-dotnet8</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+
+    <!-- Genera il file XML per la documentazione IntelliSense -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- Evita warning per i membri pubblici senza commenti -->
+    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

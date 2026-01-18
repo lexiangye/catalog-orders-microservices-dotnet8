@@ -3,9 +3,16 @@ using Microsoft.Extensions.Logging;
 
 namespace CatalogService.ClientHttp;
 
+/// <summary>
+/// Implementazione del client HTTP per interagire con le API del CatalogService.
+/// Include la gestione degli errori e il logging integrato.
+/// </summary>
+/// <param name="httpClient">L'istanza di <see cref="HttpClient"/> configurata (solitamente tramite dependency injection).</param>
+/// <param name="logger">Logger per tracciare eventuali errori di comunicazione.</param>
 public class CatalogServiceClient(HttpClient httpClient, ILogger<CatalogServiceClient> logger) 
     : ICatalogServiceClient
 {
+    /// <inheritdoc />
     public async Task<ProductResponse?> GetProductByIdAsync(int productId)
     {
         try
@@ -14,11 +21,12 @@ public class CatalogServiceClient(HttpClient httpClient, ILogger<CatalogServiceC
         }
         catch (HttpRequestException ex)
         {
-            logger.LogWarning(ex, "Failed to get product {ProductId}", productId);
+            logger.LogWarning(ex, "Errore durante il recupero del prodotto {ProductId}", productId);
             return null;
         }
     }
 
+    /// <inheritdoc />
     public async Task<IEnumerable<ProductResponse>> GetAllProductsAsync()
     {
         try
@@ -28,7 +36,7 @@ public class CatalogServiceClient(HttpClient httpClient, ILogger<CatalogServiceC
         }
         catch (HttpRequestException ex)
         {
-            logger.LogWarning(ex, "Failed to get products");
+            logger.LogWarning(ex, "Errore durante il recupero della lista prodotti");
             return [];
         }
     }
