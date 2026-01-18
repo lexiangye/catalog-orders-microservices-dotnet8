@@ -3,9 +3,14 @@ using CatalogService.Repository.Entities;
 
 namespace CatalogService.Business.Extensions;
 
+/// <summary>
+/// Metodi di estensione per la mappatura tra entità di database e oggetti di trasferimento dati (DTO).
+/// </summary>
 public static class DtoExtensions
 {
-    // Converte da Entity (Database) a DTO (Api)
+    /// <summary>
+    /// Mappa un'entità <see cref="Product"/> in un <see cref="ProductDto"/>.
+    /// </summary>
     public static ProductDto AsDto(this Product product)
     {
         return new ProductDto(
@@ -17,8 +22,9 @@ public static class DtoExtensions
         );
     }
 
-    // Converte da DTO (Api) a Entity (Database)
-    // Nota: Riceve un ID opzionale per gli update
+    /// <summary>
+    /// Mappa un'entità <see cref="ProductDto"/> in un <see cref="Product"/>.
+    /// </summary>
     public static Product ToEntity(this CreateProductDto dto)
     {
         return new Product

@@ -5,8 +5,10 @@ using CatalogService.Repository.Interfaces;
 
 namespace CatalogService.Business.Services;
 
+/// <inheritdoc />
 public class CatalogService(IProductRepository repository) : ICatalogService
 {
+    /// <inheritdoc />
     public async Task<IEnumerable<ProductDto>> GetProductsAsync()
     {
         var products = await repository.GetProductsAsync();
@@ -14,6 +16,7 @@ public class CatalogService(IProductRepository repository) : ICatalogService
         return products.Select(p => p.AsDto());
     }
 
+    /// <inheritdoc />
     public async Task<ProductDto?> GetProductByIdAsync(int id)
     {
         var product = await repository.GetProductByIdAsync(id);
@@ -21,6 +24,7 @@ public class CatalogService(IProductRepository repository) : ICatalogService
                                  // chiamare AsDto().
     }
 
+    /// <inheritdoc />
     public async Task<ProductDto> CreateProductAsync(CreateProductDto productDto)
     {
         // 1. Convertiamo DTO -> Entity
@@ -33,8 +37,10 @@ public class CatalogService(IProductRepository repository) : ICatalogService
         return product.AsDto();
     }
 
+    /// <inheritdoc />
     public async Task UpdateProductAsync(int id, CreateProductDto productDto)
     {
+        // Verifica l'esistenza prima di procedere all'aggiornamento
         var existingProduct = await repository.GetProductByIdAsync(id);
         if (existingProduct == null)
         {
@@ -57,6 +63,7 @@ public class CatalogService(IProductRepository repository) : ICatalogService
         await repository.UpdateProductAsync(existingProduct);
     }
 
+    /// <inheritdoc />
     public async Task DeleteProductAsync(int id)
     {
         await repository.DeleteProductAsync(id);
