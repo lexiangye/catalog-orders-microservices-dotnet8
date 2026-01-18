@@ -50,8 +50,11 @@ var app = builder.Build();
 // ==========================================
 // 3. PIPELINE HTTP
 // ==========================================
-app.UseSwagger();
-app.UseSwaggerUI();
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 app.UseAuthorization();
 app.MapControllers();
 
