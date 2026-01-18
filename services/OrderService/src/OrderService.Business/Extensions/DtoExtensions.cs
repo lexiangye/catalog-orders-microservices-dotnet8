@@ -3,11 +3,17 @@ using OrderService.Repository.Entities;
 
 namespace OrderService.Business.Extensions;
 
-// Metodi di estensione per convertire entità (EF) in DTO (modelli di output).
-// Così la logica di mapping resta in un punto solo e non sparsa nei services/controllers.
+/// <summary>
+/// Fornisce metodi di estensione per mappare le entità di database in oggetti di trasporto (DTO).
+/// </summary>
 public static class DtoExtensions
 {
-    // Converte un'entità Order (con le sue Lines) in un OrderDto pronto per essere restituito dall'API.
+    /// <summary>
+    /// Converte un'entità <see cref="Order"/> nel suo corrispondente <see cref="OrderDto"/>,
+    /// calcolando i totali per riga e il totale complessivo dell'ordine.
+    /// </summary>
+    /// <param name="order">L'entità sorgente.</param>
+    /// <returns>Un DTO popolato con i dati dell'ordine.</returns>
     public static OrderDto AsDto(this Order order)
     {
         // Mappa ogni OrderLine (entità) in OrderLineDto (output)

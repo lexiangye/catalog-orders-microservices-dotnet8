@@ -2,13 +2,21 @@ using CatalogOrders.Shared.Events;
 
 namespace OrderService.Business.Interfaces;
 
-// Gestisce gli eventi di stock che arrivano dal CatalogService tramite Kafka.
-// Serve per aggiornare lo stato dell’ordine in base all’esito della riserva stock (saga).
+/// <summary>
+/// Definisce i metodi per gestire le risposte asincrone provenienti dal CatalogService riguardo allo stock.
+/// Questo componente è un tassello fondamentale per la coreografia della Saga.
+/// </summary>
 public interface IStockEventHandler
 {
-    // Evento positivo: lo stock è stato riservato -> ordine può passare a Confirmed
+    /// <summary>
+    /// Gestisce l'esito positivo della prenotazione stock: conferma l'ordine nel sistema.
+    /// </summary>
+    /// <param name="evt">L'evento di stock riservato con successo.</param>
     Task HandleStockReservedAsync(StockReservedEvent evt);
 
-    // Evento negativo: riserva stock fallita -> ordine passa a Rejected/Cancelled
+    /// <summary>
+    /// Gestisce il fallimento della prenotazione stock (es. sottoscorta): rifiuta l'ordine.
+    /// </summary>
+    /// <param name="evt">L'evento contenente il motivo del fallimento.</param>
     Task HandleStockReservationFailedAsync(StockReservationFailedEvent evt);
 }
