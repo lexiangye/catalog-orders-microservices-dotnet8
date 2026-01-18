@@ -1,6 +1,8 @@
 namespace OrderService.Repository.Entities;
 
-// Rappresenta una riga di ordine nel database
+/// <summary>
+/// Rappresenta una riga di ordine nel database, contenente dettagli sul prodotto e la quantità ordinata.
+/// </summary>
 public class OrderLine
 {
     // Identificatore univoco

@@ -2,7 +2,9 @@ using CatalogOrders.Shared.Enums;
 
 namespace OrderService.Repository.Entities;
 
-// Rappresenta un ordine nel database
+/// <summary>
+/// Rappresenta un ordine nel database, contenente dettagli sullo stato, le righe ordine e la data di creazione.
+/// </summary>
 public class Order
 {
     // Identificatore univoco
