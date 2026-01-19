@@ -35,6 +35,9 @@ builder.Services.AddScoped<IStockService, StockService>();
 // === EVENT PUBLISHER (ora usa CAP invece di Kafka diretto) ===
 builder.Services.AddScoped<IEventPublisher, CapEventPublisher>();
 
+// === CAP SUBSCRIBER (riceve messaggi da Kafka) ===
+builder.Services.AddTransient<OrderEventsSubscriber>();
+
 // === CAP (Transactional Outbox) ===
 builder.Services.AddCap(options =>
 {
@@ -59,9 +62,6 @@ builder.Services.AddCap(options =>
     options.FailedRetryInterval = 60;       // Secondi tra un retry e l'altro
     options.DefaultGroupName = "catalog-service-group"; // Consumer group per Kafka
 });
-
-// === KAFKA CONSUMER (per ora lo teniamo, poi lo sostituiremo con CAP Subscriber) ===
-builder.Services.AddHostedService<OrderEventsConsumer>();
 
 // ==========================================
 // 2. COSTRUZIONE DELL'APP
