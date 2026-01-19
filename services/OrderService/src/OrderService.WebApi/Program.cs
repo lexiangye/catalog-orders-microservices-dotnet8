@@ -59,6 +59,10 @@ builder.Services.AddCap(options =>
     options.FailedRetryInterval = 30;
 });
 
+// Event Publisher via CAP
+builder.Services.AddScoped<IEventPublisher, CapEventPublisher>();
+
+// Consumer per eventi Stock
 builder.Services.AddHostedService<StockEventsConsumer>();
 
 // ==========================================
