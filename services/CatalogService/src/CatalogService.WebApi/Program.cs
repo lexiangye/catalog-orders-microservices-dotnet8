@@ -32,8 +32,32 @@ builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<ICatalogService, CatalogService.Business.Services.CatalogService>();
 builder.Services.AddScoped<IStockService, StockService>();
 
-// === KAFKA (Singleton per producer, HostedService per consumer) ===
-builder.Services.AddSingleton<IEventPublisher, KafkaEventPublisher>();
+// === CAP (Transactional Outbox) ===
+builder.Services.AddCap(options =>
+{
+    // 1. Configura MySQL come storage per l'Outbox
+    //    CAP creerà automaticamente le tabelle `cap.published` e `cap.received`
+    options.UseMySql(connectionString!);
+
+    // 2. Configura Kafka come message broker
+    options.UseKafka(kafkaOptions =>
+    {
+        kafkaOptions.Servers = builder.Configuration["Kafka:BootstrapServers"] ?? "localhost:9092";
+    });
+
+    // 3. Abilita la Dashboard (accessibile a /cap)
+    options.UseDashboard(dashboardOptions =>
+    {
+        dashboardOptions.PathMatch = "/cap"; // URL: http://localhost:5052/cap
+    });
+
+    // 4. Opzioni avanzate (opzionali ma utili)
+    options.FailedRetryCount = 5;           // Riprova 5 volte in caso di fallimento
+    options.FailedRetryInterval = 60;       // Secondi tra un retry e l'altro
+    options.DefaultGroupName = "catalog-service-group"; // Consumer group per Kafka
+});
+
+// === KAFKA CONSUMER (per ora lo teniamo, poi lo sostituiremo con CAP Subscriber) ===
 builder.Services.AddHostedService<OrderEventsConsumer>();
 
 // ==========================================
@@ -44,14 +68,13 @@ var app = builder.Build();
 // ==========================================
 // 3. PIPELINE HTTP (Middleware)
 // ==========================================
-// Abilita Swagger sia in dev che in prod
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 app.UseAuthorization();
-app.MapControllers(); // mappa le rotte dei Controller
+app.MapControllers();
 
 // ==========================================
 // 4. MIGRATION AUTOMATICA (Avvio)
