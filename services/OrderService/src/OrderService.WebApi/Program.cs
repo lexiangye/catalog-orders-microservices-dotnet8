@@ -1,6 +1,5 @@
 using CatalogService.ClientHttp;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Http.Resilience;
 using OrderService.Business.Interfaces;
 using OrderService.Business.Services;
 using OrderService.Repository.Data;
