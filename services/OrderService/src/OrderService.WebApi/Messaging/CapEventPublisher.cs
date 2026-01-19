@@ -1,4 +1,3 @@
-using System.Text.Json;
 using CatalogOrders.Shared.Constants;
 using CatalogOrders.Shared.Enums;
 using CatalogOrders.Shared.Events;
@@ -13,18 +12,12 @@ namespace OrderService.WebApi.Messaging;
 /// </summary>
 public class CapEventPublisher(ICapPublisher capPublisher, ILogger<CapEventPublisher> logger) : IEventPublisher
 {
-    private readonly JsonSerializerOptions _jsonOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-    };
-
     /// <inheritdoc />
     public async Task PublishOrderCreatedAsync(OrderCreatedEvent evt)
     {
         var envelope = EventEnvelope<OrderCreatedEvent>.Create(evt, EventType.OrderCreated);
-        var json = JsonSerializer.Serialize(envelope, _jsonOptions);
         
-        await capPublisher.PublishAsync(KafkaTopics.OrderCreated, json);
+        await capPublisher.PublishAsync(KafkaTopics.OrderCreated, envelope); // 👈 Passa l'oggetto, non la stringa
         logger.LogInformation("📤 Published {EventType} to {Topic} via CAP Outbox", 
             envelope.EventType, KafkaTopics.OrderCreated);
     }
@@ -33,9 +26,8 @@ public class CapEventPublisher(ICapPublisher capPublisher, ILogger<CapEventPubli
     public async Task PublishOrderCancelledAsync(OrderCancelledEvent evt)
     {
         var envelope = EventEnvelope<OrderCancelledEvent>.Create(evt, EventType.OrderCancelled);
-        var json = JsonSerializer.Serialize(envelope, _jsonOptions);
         
-        await capPublisher.PublishAsync(KafkaTopics.OrderCancelled, json);
+        await capPublisher.PublishAsync(KafkaTopics.OrderCancelled, envelope); // 👈 Passa l'oggetto, non la stringa
         logger.LogInformation("📤 Published {EventType} to {Topic} via CAP Outbox", 
             envelope.EventType, KafkaTopics.OrderCancelled);
     }
