@@ -10,6 +10,10 @@
     <ItemGroup>
         <PackageReference Include="CatalogOrders.Shared" Version="1.0.1" />
         <PackageReference Include="Confluent.Kafka" Version="2.6.1" />
+        <PackageReference Include="DotNetCore.CAP" Version="8.3.5" />
+        <PackageReference Include="DotNetCore.CAP.Dashboard" Version="8.3.5" />
+        <PackageReference Include="DotNetCore.CAP.Kafka" Version="8.3.5" />
+        <PackageReference Include="DotNetCore.CAP.MySql" Version="8.3.5" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.13" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.13">
           <PrivateAssets>all</PrivateAssets>
