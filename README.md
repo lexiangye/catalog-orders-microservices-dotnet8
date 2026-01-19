@@ -98,22 +98,62 @@ Attendi che:
 - i due servizi risultino in ascolto (nei log vedrai “Now listening on ...”)
 - le migrations vengano applicate automaticamente all’avvio (nei log vedrai righe di EF Core / migrazioni)
 
-### 2) Swagger / endpoint
 
-Apri Swagger dal browser:
-- CatalogService: `http://localhost:5052/swagger`
-- OrderService: `http://localhost:5053/swagger`
+### 2) Service map (link rapidi)
+
+> Qui trovi tutto quello che ti serve per aprire Swagger e la CAP Dashboard senza cercare nel compose.
+
+#### Applicazioni
+
+| Servizio | Host | Swagger | CAP Dashboard |
+| :-- | :-- | :-- | :-- |
+| **CatalogService** | `http://localhost:5052` | [`/swagger`](http://localhost:5052/swagger) | [`/cap`](http://localhost:5052/cap) |
+| **OrderService** | `http://localhost:5053` | [`/swagger`](http://localhost:5053/swagger) | [`/cap`](http://localhost:5053/cap) |
+
+#### Infrastruttura (porte)
+
+| Componente | Porta host | Note |
+| :-- | --: | :-- |
+| MySQL (Catalog) | `3306` | DB CatalogService |
+| MySQL (Order) | `3307` | DB OrderService |
+| Kafka Broker | `9092` | bootstrap server |
 
 ### 3) Test rapido end-to-end (manuale)
 
-1. **CatalogService**: crea un prodotto con quantità iniziale a magazzino  
-2. **OrderService**: crea un ordine per quel prodotto  
+1. **CatalogService**: crea un prodotto con quantità iniziale a magazzino
+2. **OrderService**: crea un ordine per quel prodotto
 3. Verifica:
    - scorte scalate nel CatalogService
    - ordine aggiornato a `CONFIRMED` (se stock OK) oppure `REJECTED` (se stock insufficiente)
 
+
 ---
 
+## Monitoraggio e Affidabilità (CAP Dashboard)
+
+Il progetto implementa i pattern **Transactional Outbox** e **Transactional Inbox** tramite **DotNetCore.CAP**. Questo assicura che la comunicazione tra i microservizi sia sempre consistente con lo stato dei rispettivi database.
+
+Ogni servizio espone una dashboard di controllo:
+- **CatalogService Dashboard**: `http://localhost:5052/cap`
+- **OrderService Dashboard**: `http://localhost:5053/cap`
+
+### I Pattern implementati:
+
+1.  **Transactional Outbox (Sezione "Published")**: 
+    - Quando un servizio salva dati sul DB e deve inviare un messaggio (es. `OrderCreated`), CAP salva il messaggio in una tabella locale (`cap.published`) nella stessa transazione del DB. 
+    - Garantisce che il messaggio venga inviato a Kafka **solo se** l'operazione sul database ha successo.
+
+2.  **Transactional Inbox (Sezione "Received")**: 
+    - Quando un messaggio arriva da Kafka, viene prima persistito nella tabella locale `cap.received` e poi elaborato.
+    - **Idempotenza**: Se Kafka invia lo stesso messaggio due volte, CAP riconosce l'ID già presente nell'Inbox e non riesegue la logica di business, evitando duplicazioni (es. scalare due volte lo stock per lo stesso ordine).
+    - **Resilienza**: Se il codice di elaborazione fallisce, il messaggio rimane nell'Inbox in stato "Failed", permettendo il monitoraggio e il recupero.
+
+### Funzionalità della Dashboard:
+- **Audit**: Ispezione del contenuto JSON di ogni messaggio inviato e ricevuto.
+- **Error Log**: Visualizzazione immediata delle eccezioni lanciate dai Subscriber.
+- **Manual Retry**: Possibilità di forzare la rielaborazione di un messaggio fallito (Inbox) o il rinvio di uno non consegnato (Outbox).
+
+---
 ## Stop e pulizia
 
 Stop dei container:
