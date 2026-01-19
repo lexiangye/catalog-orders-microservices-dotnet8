@@ -3,7 +3,7 @@ using CatalogService.Repository.Interfaces;
 using CatalogService.Repository.Repositories;
 using CatalogService.Business.Interfaces;
 using CatalogService.Business.Services;
-using CatalogService.WebApi.Kafka;
+using CatalogService.WebApi.Messaging;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,9 +32,38 @@ builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<ICatalogService, CatalogService.Business.Services.CatalogService>();
 builder.Services.AddScoped<IStockService, StockService>();
 
-// === KAFKA (Singleton per producer, HostedService per consumer) ===
-builder.Services.AddSingleton<IEventPublisher, KafkaEventPublisher>();
-builder.Services.AddHostedService<OrderEventsConsumer>();
+// === CAP (Transactional Outbox e Inbox + Kafka) ===
+builder.Services.AddCap(options =>
+{
+    // Configura MySQL come storage per l'Outbox
+    // CAP creerà automaticamente le tabelle `cap.published` e `cap.received`
+    options.UseMySql(connectionString!);
+
+    // Configura Kafka come message broker
+    options.UseKafka(kafkaOptions =>
+    {
+        kafkaOptions.Servers = builder.Configuration["Kafka:BootstrapServers"] ?? "localhost:9092";
+    });
+
+    // Dashboard CAP per monitoraggio (accessibile su /cap)
+    options.UseDashboard(dashboardOptions =>
+    {
+        dashboardOptions.PathMatch = "/cap"; // URL: http://localhost:5052/cap
+    });
+
+    // Nome del gruppo consumer per questo servizio
+    options.DefaultGroupName = "catalog-service-group";
+    
+    // Retry policy per messaggi falliti
+    options.FailedRetryCount = 5;
+    options.FailedRetryInterval = 30;
+});
+
+// === CAP Event Publisher ===
+builder.Services.AddScoped<IEventPublisher, CapEventPublisher>();
+
+// === CAP Subscriber per eventi Stock ===
+builder.Services.AddTransient<CapOrderEventsSubscriber>();
 
 // ==========================================
 // 2. COSTRUZIONE DELL'APP
@@ -44,14 +73,13 @@ var app = builder.Build();
 // ==========================================
 // 3. PIPELINE HTTP (Middleware)
 // ==========================================
-// Abilita Swagger sia in dev che in prod
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 app.UseAuthorization();
-app.MapControllers(); // mappa le rotte dei Controller
+app.MapControllers();
 
 // ==========================================
 // 4. MIGRATION AUTOMATICA (Avvio)

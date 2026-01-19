@@ -1,13 +1,11 @@
-
 using CatalogService.ClientHttp;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Http.Resilience;
 using OrderService.Business.Interfaces;
 using OrderService.Business.Services;
 using OrderService.Repository.Data;
 using OrderService.Repository.Interfaces;
 using OrderService.Repository.Repositories;
-using OrderService.WebApi.Kafka;
+using OrderService.WebApi.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,9 +35,35 @@ builder.Services.AddCatalogServiceClient(options =>
     options.BaseUrl = builder.Configuration["CatalogService:BaseUrl"] ?? "http://localhost:5052";
 });
 
-// === KAFKA ===
-builder.Services.AddSingleton<IEventPublisher, KafkaEventPublisher>();
-builder.Services.AddHostedService<StockEventsConsumer>();
+// === CAP (Transactional Outbox e Inbox + Kafka) ===
+builder.Services.AddCap(options =>
+{
+    // Configura MySQL come storage per l'Outbox
+    // CAP creerà automaticamente le tabelle `cap.published` e `cap.received`
+    options.UseMySql(connectionString!);
+    
+    // Configura Kafka come message broker
+    options.UseKafka(kafka =>
+    {
+        kafka.Servers = builder.Configuration["Kafka:BootstrapServers"] ?? "localhost:9092";
+    });
+    
+    // Dashboard CAP per monitoraggio (accessibile su /cap)
+    options.UseDashboard(d => d.PathMatch = "/cap");
+    
+    // Nome del gruppo consumer per questo servizio
+    options.DefaultGroupName = "order-service";
+    
+    // Retry policy per messaggi falliti
+    options.FailedRetryCount = 5;
+    options.FailedRetryInterval = 30;
+});
+
+// === CAP Event Publisher ===
+builder.Services.AddScoped<IEventPublisher, CapEventPublisher>();
+
+// === CAP Subscriber per eventi Stock ===
+builder.Services.AddTransient<CapStockEventsSubscriber>();
 
 // ==========================================
 // 2. COSTRUZIONE DELL'APP
