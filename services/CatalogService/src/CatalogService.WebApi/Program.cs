@@ -3,7 +3,7 @@ using CatalogService.Repository.Interfaces;
 using CatalogService.Repository.Repositories;
 using CatalogService.Business.Interfaces;
 using CatalogService.Business.Services;
-using CatalogService.WebApi.Kafka;
+using CatalogService.WebApi.Messaging;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

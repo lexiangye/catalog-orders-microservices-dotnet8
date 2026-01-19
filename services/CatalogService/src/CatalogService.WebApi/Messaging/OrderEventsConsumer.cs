@@ -4,7 +4,7 @@ using CatalogOrders.Shared.Events;
 using CatalogService.Business.Interfaces;
 using Confluent.Kafka;
 
-namespace CatalogService.WebApi.Kafka;
+namespace CatalogService.WebApi.Messaging;
 
 /// <summary>
 /// Worker in background che consuma eventi riguardanti gli ordini (creazione/cancellazione).

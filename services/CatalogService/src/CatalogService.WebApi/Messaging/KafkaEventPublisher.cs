@@ -5,7 +5,7 @@ using CatalogOrders.Shared.Events;
 using CatalogService.Business.Interfaces;
 using Confluent.Kafka;
 
-namespace CatalogService.WebApi.Kafka;
+namespace CatalogService.WebApi.Messaging;
 
 /// <summary>
 /// Implementazione concreta del publisher Kafka. 
