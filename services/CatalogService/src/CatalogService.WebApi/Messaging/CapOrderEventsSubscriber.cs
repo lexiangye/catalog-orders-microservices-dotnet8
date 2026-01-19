@@ -10,9 +10,9 @@ namespace CatalogService.WebApi.Messaging;
 /// Subscriber CAP che ascolta gli eventi degli ordini da Kafka.
 /// I messaggi ricevuti vengono salvati nella tabella "cap.received" per garantire idempotenza.
 /// </summary>
-public class OrderEventsSubscriber(
+public class CapOrderEventsSubscriber(
     IStockService stockService,
-    ILogger<OrderEventsSubscriber> logger) : ICapSubscribe
+    ILogger<CapOrderEventsSubscriber> logger) : ICapSubscribe
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {

@@ -12,14 +12,14 @@ namespace OrderService.WebApi.Messaging;
 /// - Deduplicazione automatica (idempotenza)
 /// - Retry automatico in caso di fallimento
 /// </summary>
-public class CapStockEventsConsumer : ICapSubscribe
+public class CapStockEventsSubscriber : ICapSubscribe
 {
     private readonly IStockEventHandler _handler;
-    private readonly ILogger<CapStockEventsConsumer> _logger;
+    private readonly ILogger<CapStockEventsSubscriber> _logger;
 
-    public CapStockEventsConsumer(
+    public CapStockEventsSubscriber(
         IStockEventHandler handler,
-        ILogger<CapStockEventsConsumer> logger)
+        ILogger<CapStockEventsSubscriber> logger)
     {
         _handler = handler;
         _logger = logger;

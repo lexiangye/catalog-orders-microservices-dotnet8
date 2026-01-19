@@ -32,36 +32,38 @@ builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<ICatalogService, CatalogService.Business.Services.CatalogService>();
 builder.Services.AddScoped<IStockService, StockService>();
 
-// === EVENT PUBLISHER (ora usa CAP invece di Kafka diretto) ===
-builder.Services.AddScoped<IEventPublisher, CapEventPublisher>();
-
-// === CAP SUBSCRIBER (riceve messaggi da Kafka) ===
-builder.Services.AddTransient<OrderEventsSubscriber>();
-
-// === CAP (Transactional Outbox) ===
+// === CAP (Transactional Outbox e Inbox + Kafka) ===
 builder.Services.AddCap(options =>
 {
-    // 1. Configura MySQL come storage per l'Outbox
-    //    CAP creerà automaticamente le tabelle `cap.published` e `cap.received`
+    // Configura MySQL come storage per l'Outbox
+    // CAP creerà automaticamente le tabelle `cap.published` e `cap.received`
     options.UseMySql(connectionString!);
 
-    // 2. Configura Kafka come message broker
+    // Configura Kafka come message broker
     options.UseKafka(kafkaOptions =>
     {
         kafkaOptions.Servers = builder.Configuration["Kafka:BootstrapServers"] ?? "localhost:9092";
     });
 
-    // 3. Abilita la Dashboard (accessibile a /cap)
+    // Dashboard CAP per monitoraggio (accessibile su /cap)
     options.UseDashboard(dashboardOptions =>
     {
         dashboardOptions.PathMatch = "/cap"; // URL: http://localhost:5052/cap
     });
 
-    // 4. Opzioni avanzate (opzionali ma utili)
-    options.FailedRetryCount = 5;           // Riprova 5 volte in caso di fallimento
-    options.FailedRetryInterval = 60;       // Secondi tra un retry e l'altro
-    options.DefaultGroupName = "catalog-service-group"; // Consumer group per Kafka
+    // Nome del gruppo consumer per questo servizio
+    options.DefaultGroupName = "catalog-service-group";
+    
+    // Retry policy per messaggi falliti
+    options.FailedRetryCount = 5;
+    options.FailedRetryInterval = 30;
 });
+
+// === CAP Event Publisher ===
+builder.Services.AddScoped<IEventPublisher, CapEventPublisher>();
+
+// === CAP Subscriber per eventi Stock ===
+builder.Services.AddTransient<CapOrderEventsSubscriber>();
 
 // ==========================================
 // 2. COSTRUZIONE DELL'APP

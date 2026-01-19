@@ -38,10 +38,11 @@ builder.Services.AddCatalogServiceClient(options =>
 // === CAP (Transactional Outbox e Inbox + Kafka) ===
 builder.Services.AddCap(options =>
 {
-    // Usa MySQL come storage per l'outbox e l'inbox (stessa connessione del DbContext)
+    // Configura MySQL come storage per l'Outbox
+    // CAP creerà automaticamente le tabelle `cap.published` e `cap.received`
     options.UseMySql(connectionString!);
     
-    // Usa Kafka come message broker
+    // Configura Kafka come message broker
     options.UseKafka(kafka =>
     {
         kafka.Servers = builder.Configuration["Kafka:BootstrapServers"] ?? "localhost:9092";
@@ -58,11 +59,11 @@ builder.Services.AddCap(options =>
     options.FailedRetryInterval = 30;
 });
 
-// Publisher CAP
+// === CAP Event Publisher ===
 builder.Services.AddScoped<IEventPublisher, CapEventPublisher>();
 
-// Consumer CAP per eventi Stock (Transactional Inbox)
-builder.Services.AddTransient<CapStockEventsConsumer>();
+// === CAP Subscriber per eventi Stock ===
+builder.Services.AddTransient<CapStockEventsSubscriber>();
 
 // ==========================================
 // 2. COSTRUZIONE DELL'APP
