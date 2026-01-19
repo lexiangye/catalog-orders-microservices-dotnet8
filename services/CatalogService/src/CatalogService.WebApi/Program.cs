@@ -32,6 +32,9 @@ builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<ICatalogService, CatalogService.Business.Services.CatalogService>();
 builder.Services.AddScoped<IStockService, StockService>();
 
+// === EVENT PUBLISHER (ora usa CAP invece di Kafka diretto) ===
+builder.Services.AddScoped<IEventPublisher, CapEventPublisher>();
+
 // === CAP (Transactional Outbox) ===
 builder.Services.AddCap(options =>
 {
