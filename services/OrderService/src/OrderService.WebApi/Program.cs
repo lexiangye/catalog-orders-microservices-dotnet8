@@ -1,4 +1,3 @@
-
 using CatalogService.ClientHttp;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Http.Resilience;
@@ -37,8 +36,29 @@ builder.Services.AddCatalogServiceClient(options =>
     options.BaseUrl = builder.Configuration["CatalogService:BaseUrl"] ?? "http://localhost:5052";
 });
 
-// === KAFKA ===
-builder.Services.AddSingleton<IEventPublisher, KafkaEventPublisher>();
+// === CAP (Transactional Outbox + Kafka) ===
+builder.Services.AddCap(options =>
+{
+    // Usa MySQL come storage per l'outbox (stessa connessione del DbContext)
+    options.UseMySql(connectionString!);
+    
+    // Usa Kafka come message broker
+    options.UseKafka(kafka =>
+    {
+        kafka.Servers = builder.Configuration["Kafka:BootstrapServers"] ?? "localhost:9092";
+    });
+    
+    // Dashboard CAP per monitoraggio (accessibile su /cap)
+    options.UseDashboard(d => d.PathMatch = "/cap");
+    
+    // Nome del gruppo consumer per questo servizio
+    options.DefaultGroupName = "order-service";
+    
+    // Retry policy per messaggi falliti
+    options.FailedRetryCount = 5;
+    options.FailedRetryInterval = 30;
+});
+
 builder.Services.AddHostedService<StockEventsConsumer>();
 
 // ==========================================
