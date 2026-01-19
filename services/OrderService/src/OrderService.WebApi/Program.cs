@@ -6,7 +6,7 @@ using OrderService.Business.Services;
 using OrderService.Repository.Data;
 using OrderService.Repository.Interfaces;
 using OrderService.Repository.Repositories;
-using OrderService.WebApi.Kafka;
+using OrderService.WebApi.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
 

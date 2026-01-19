@@ -5,7 +5,7 @@ using CatalogOrders.Shared.Events;
 using Confluent.Kafka;
 using OrderService.Business.Interfaces;
 
-namespace OrderService.WebApi.Kafka;
+namespace OrderService.WebApi.Messaging;
 
 /// <summary>
 /// Servizio responsabile della pubblicazione di eventi di dominio sul bus di messaggi Apache Kafka.

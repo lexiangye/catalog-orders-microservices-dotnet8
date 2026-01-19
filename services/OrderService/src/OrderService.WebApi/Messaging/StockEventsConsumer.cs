@@ -4,7 +4,7 @@ using CatalogOrders.Shared.Events;
 using Confluent.Kafka;
 using OrderService.Business.Interfaces;
 
-namespace OrderService.WebApi.Kafka;
+namespace OrderService.WebApi.Messaging;
 
 /// <summary>
 /// Worker di background che consuma eventi riguardanti lo stock dal broker Kafka.
